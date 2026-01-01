@@ -8,6 +8,7 @@ import YouTubeGallery from './components/YouTubeGallery';
 import NewsSection from './components/NewsSection';
 import BlogPage from './components/BlogPage';
 import CampaignAssistant from './components/CampaignAssistant';
+import ScrollToTop from './components/ScrollToTop';
 import AdminDashboard from './components/AdminDashboard';
 import { VolunteerModal, ProblemModal } from './components/Modals';
 import { POLICIES, NEWS, UI_STRINGS, BIOGRAPHY_CONTENT, VISION_CONTENT, SOCIAL_LINKS } from './constants';
@@ -63,12 +64,12 @@ const App: React.FC = () => {
         onLanguageChange={setLanguage} 
         currentPage={currentPage}
         onPageChange={setCurrentPage}
+        onJoinClick={() => setShowVolunteerModal(true)}
       />
       
       {currentPage === 'home' && (
         <>
           <Hero currentLanguage={language} />
-          {/* About Summary */}
           <section id="about" className="py-20 md:py-24 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid md:grid-cols-2 gap-10 lg:gap-16 items-center">
@@ -102,7 +103,6 @@ const App: React.FC = () => {
             </div>
           </section>
 
-          {/* Vision Preview */}
           <section className="py-20 md:py-24 bg-slate-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
               <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-12 font-heading">
@@ -122,7 +122,6 @@ const App: React.FC = () => {
             </div>
           </section>
 
-          {/* Decorative Divider */}
           <div className="bg-slate-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex items-center justify-center space-x-4">
@@ -206,7 +205,6 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Call to Action - Common */}
       <section className="py-20 md:py-24 bg-green-900 text-white overflow-hidden relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <h2 className="text-3xl md:text-5xl font-bold mb-4 font-heading">{language === 'bn' ? 'আপনি কি এই পরিবর্তনের অংশ হবেন?' : 'Will you be a part of this change?'}</h2>
@@ -234,7 +232,11 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center mb-12">
             <div className="text-center md:text-left mb-8 md:mb-0">
-              <div className="text-2xl font-bold tracking-tight text-green-900 uppercase mb-1 font-heading">
+              <div 
+                onDoubleClick={() => setShowAdminDashboard(true)}
+                className="text-2xl font-bold tracking-tight text-green-900 uppercase mb-1 font-heading cursor-default select-none"
+                title={language === 'bn' ? 'শেখ মনজুরুল হক (রাহাদ)' : 'Sheikh Monzurul Haque'}
+              >
                 {language === 'bn' ? 'শেখ মনজুরুল হক (রাহাদ)' : 'Sheikh Monzurul Haque'}
               </div>
               <div className="text-slate-500 font-medium">
@@ -255,13 +257,6 @@ const App: React.FC = () => {
                 bgColor="bg-[#FF0000]"
                 svg={<path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />}
               />
-              <button 
-                onClick={() => setShowAdminDashboard(true)}
-                className="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all shadow-md active:scale-95"
-                title="Admin Dashboard"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-              </button>
             </div>
           </div>
           
@@ -279,11 +274,11 @@ const App: React.FC = () => {
         </div>
       </footer>
 
-      {/* Modals & Dashboard Overlay */}
       <VolunteerModal isOpen={showVolunteerModal} onClose={() => setShowVolunteerModal(false)} lang={language} />
       <ProblemModal isOpen={showProblemModal} onClose={() => setShowProblemModal(false)} lang={language} />
       {showAdminDashboard && <AdminDashboard onClose={() => setShowAdminDashboard(false)} lang={language} />}
       
+      <ScrollToTop />
       <CampaignAssistant />
     </div>
   );
