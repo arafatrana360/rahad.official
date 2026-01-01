@@ -28,7 +28,7 @@ const NewsSection: React.FC<NewsSectionProps> = ({ lang, onViewAll }) => {
         {/* News Grid */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           {NEWS.map((item) => (
-            <article key={item.id} className="group bg-slate-50 rounded-[2.5rem] overflow-hidden border border-slate-100 hover:shadow-2xl hover:shadow-green-900/5 transition-all duration-500">
+            <article key={item.id} className="group bg-slate-50 rounded-[2.5rem] overflow-hidden border border-slate-100 hover:shadow-2xl hover:shadow-green-900/5 transition-all duration-500 flex flex-col h-full">
               <div className="relative h-64 overflow-hidden">
                 <img 
                   src={item.imageUrl} 
@@ -48,7 +48,7 @@ const NewsSection: React.FC<NewsSectionProps> = ({ lang, onViewAll }) => {
                 </div>
               </div>
 
-              <div className="p-8">
+              <div className="p-8 flex flex-col flex-1">
                 <div className="flex items-center text-slate-400 text-sm mb-4 font-bold">
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -60,25 +60,27 @@ const NewsSection: React.FC<NewsSectionProps> = ({ lang, onViewAll }) => {
                   {item.title[lang]}
                 </h3>
                 
-                <p className="text-slate-600 mb-8 line-clamp-3">
+                <p className="text-slate-600 mb-8 line-clamp-3 leading-relaxed">
                   {item.excerpt[lang]}
                 </p>
                 
-                <button 
-                  onClick={onViewAll}
-                  className="flex items-center text-green-700 font-bold group/btn"
-                >
-                  <span>{lang === 'bn' ? 'বিস্তারিত পড়ুন' : 'Read More'}</span>
-                  <svg className="w-5 h-5 ml-2 transform group-hover/btn:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </button>
+                <div className="mt-auto">
+                  <button 
+                    onClick={onViewAll}
+                    className="flex items-center text-green-700 font-bold group/btn"
+                  >
+                    <span>{lang === 'bn' ? 'বিস্তারিত পড়ুন' : 'Read More'}</span>
+                    <svg className="w-5 h-5 ml-2 transform group-hover/btn:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </article>
           ))}
         </div>
 
-        {/* Unified "View All" Button at the bottom */}
+        {/* Unified "View All" Button */}
         <div className="text-center">
           <button 
             onClick={onViewAll}
