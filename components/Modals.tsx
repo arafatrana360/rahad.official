@@ -224,3 +224,133 @@ export const ProblemModal: React.FC<ModalProps> = ({ isOpen, onClose, lang }) =>
     </div>
   );
 };
+
+export const MeetingModal: React.FC<ModalProps> = ({ isOpen, onClose, lang }) => {
+  const [formData, setFormData] = useState({ name: '', phone: '', location: '', peopleCount: '', isCommitted: false });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.isCommitted) return;
+    setIsSubmitting(true);
+    
+    const submission = { ...formData, id: Date.now().toString(), timestamp: Date.now() };
+    const existing = JSON.parse(localStorage.getItem('meetings') || '[]');
+    localStorage.setItem('meetings', JSON.stringify([submission, ...existing]));
+    
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSuccess(true);
+      setTimeout(() => {
+        setIsSuccess(false);
+        onClose();
+        setFormData({ name: '', phone: '', location: '', peopleCount: '', isCommitted: false });
+      }, 2000);
+    }, 800);
+  };
+
+  const inputClass = "w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition-all";
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="bg-amber-600 p-6 text-white flex justify-between items-center">
+          <h2 className="text-2xl font-bold font-heading">
+            {lang === 'bn' ? 'উঠান বৈঠকের আমন্ত্রণ' : 'Courtyard Meeting Invite'}
+          </h2>
+          <button onClick={onClose} className="hover:rotate-90 transition-transform">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+
+        {isSuccess ? (
+          <div className="p-12 text-center animate-in zoom-in duration-500">
+            <div className="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+            </div>
+            <h3 className="text-2xl font-bold text-slate-800 mb-2">
+              {lang === 'bn' ? 'আমন্ত্রণ গ্রহণ করা হয়েছে' : 'Invitation Accepted'}
+            </h3>
+            <p className="text-slate-600">
+              {lang === 'bn' ? 'আমাদের প্রতিনিধি শীঘ্রই আপনার সাথে যোগাযোগ করবেন।' : 'Our representative will contact you shortly.'}
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-1">{lang === 'bn' ? 'আপনার নাম' : 'Your Name'}</label>
+              <input 
+                required 
+                type="text" 
+                className={inputClass} 
+                value={formData.name} 
+                onChange={e => setFormData({...formData, name: e.target.value})} 
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1">{lang === 'bn' ? 'মোবাইল নম্বর' : 'Mobile Number'}</label>
+                <input 
+                  required 
+                  type="tel" 
+                  className={inputClass} 
+                  value={formData.phone} 
+                  onChange={e => setFormData({...formData, phone: e.target.value})} 
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1">{lang === 'bn' ? 'মানুষের সংখ্যা' : 'No. of People'}</label>
+                <input 
+                  required 
+                  type="number" 
+                  placeholder="৫-১০"
+                  className={inputClass} 
+                  value={formData.peopleCount} 
+                  onChange={e => setFormData({...formData, peopleCount: e.target.value})} 
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-1">{lang === 'bn' ? 'নির্ধারিত স্থান (আপনার এলাকা)' : 'Meeting Location (Area)'}</label>
+              <input 
+                required 
+                type="text" 
+                placeholder={lang === 'bn' ? 'গ্রাম/ওয়ার্ড/ইউনিয়ন' : 'Village/Ward/Union'}
+                className={inputClass} 
+                value={formData.location} 
+                onChange={e => setFormData({...formData, location: e.target.value})} 
+              />
+            </div>
+            
+            <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 mt-2">
+              <label className="flex items-start space-x-3 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  required
+                  className="mt-1.5 w-4 h-4 text-amber-600 rounded focus:ring-amber-500" 
+                  checked={formData.isCommitted}
+                  onChange={e => setFormData({...formData, isCommitted: e.target.checked})}
+                />
+                <span className="text-xs text-amber-900 leading-relaxed font-medium">
+                  {lang === 'bn' 
+                    ? 'আমি অঙ্গীকার করছি যে নির্ধারিত সময়ে আমি উল্লেখিত সংখ্যক মানুষকে উল্লেখিত স্থানে একত্রিত করব।' 
+                    : 'I declare that I will gather the mentioned number of people at the scheduled location on time.'}
+                </span>
+              </label>
+            </div>
+
+            <button 
+              disabled={isSubmitting || !formData.isCommitted} 
+              className="w-full bg-amber-600 text-white py-3.5 rounded-xl font-bold shadow-lg hover:bg-amber-700 disabled:opacity-50 transition-all active:scale-95 mt-2"
+            >
+              {isSubmitting ? (lang === 'bn' ? 'জমা হচ্ছে...' : 'Submitting...') : (lang === 'bn' ? 'আমন্ত্রণ পাঠান' : 'Send Invitation')}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+};

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { VolunteerSubmission, ProblemReport, Language } from '../types';
+import { VolunteerSubmission, ProblemReport, MeetingInvitation, Language } from '../types';
 import { GoogleGenAI } from "@google/genai";
 
 interface AdminDashboardProps {
@@ -13,9 +13,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState(false);
   
-  const [activeTab, setActiveTab] = useState<'volunteers' | 'problems'>('volunteers');
+  const [activeTab, setActiveTab] = useState<'volunteers' | 'problems' | 'meetings'>('volunteers');
   const [volunteers, setVolunteers] = useState<VolunteerSubmission[]>([]);
   const [problems, setProblems] = useState<ProblemReport[]>([]);
+  const [meetings, setMeetings] = useState<MeetingInvitation[]>([]);
   const [aiSummary, setAiSummary] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -28,14 +29,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
 
     const v = JSON.parse(localStorage.getItem('volunteers') || '[]');
     const p = JSON.parse(localStorage.getItem('problems') || '[]');
+    const m = JSON.parse(localStorage.getItem('meetings') || '[]');
     setVolunteers(v);
     setProblems(p);
+    setMeetings(m);
   }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this should be checked on a backend.
-    // Here we use an environment variable or a default fallback.
     const secret = process.env.ADMIN_PASSWORD || 'rahad2026';
     
     if (password === secret) {
@@ -51,6 +52,29 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
   const handleLogout = () => {
     setIsAuthenticated(false);
     sessionStorage.removeItem('rahad_admin_auth');
+  };
+
+  const downloadCSV = (data: any[], filename: string) => {
+    if (data.length === 0) return;
+    const headers = Object.keys(data[0]);
+    const csvRows = [
+      headers.join(','),
+      ...data.map(row => 
+        headers.map(fieldName => JSON.stringify(row[fieldName], (key, value) => value === null ? '' : value)).join(',')
+      )
+    ];
+    const csvString = csvRows.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
 
   const handleAnalyze = async () => {
@@ -76,8 +100,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
     if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
       localStorage.removeItem('volunteers');
       localStorage.removeItem('problems');
+      localStorage.removeItem('meetings');
       setVolunteers([]);
       setProblems([]);
+      setMeetings([]);
     }
   };
 
@@ -183,13 +209,28 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
           >
             {lang === 'bn' ? 'সমস্যা রিপোর্ট' : 'Problem Reports'} ({problems.length})
           </button>
+          <button 
+            onClick={() => setActiveTab('meetings')}
+            className={`w-full text-left px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'meetings' ? 'bg-amber-600 text-white shadow-lg' : 'text-slate-400 hover:bg-white/5'}`}
+          >
+            {lang === 'bn' ? 'উঠান বৈঠক আমন্ত্রণ' : 'Meeting Invites'} ({meetings.length})
+          </button>
         </div>
 
         {/* Content */}
         <div className="flex-1 p-6 overflow-y-auto bg-slate-900 text-white">
-          {activeTab === 'volunteers' ? (
+          {activeTab === 'volunteers' && (
             <div className="space-y-4">
-              <h2 className="text-2xl font-bold mb-6 font-heading">Recent Registrations</h2>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold font-heading">Recent Registrations</h2>
+                <button 
+                  onClick={() => downloadCSV(volunteers, 'volunteers_rahad_campaign.csv')}
+                  className="bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center space-x-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                  <span>Export CSV</span>
+                </button>
+              </div>
               <div className="grid gap-4">
                 {[...volunteers].reverse().map(v => (
                   <div key={v.id} className="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-sm">
@@ -207,18 +248,29 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
                 {volunteers.length === 0 && <p className="text-slate-500 text-center py-20">No volunteers registered yet.</p>}
               </div>
             </div>
-          ) : (
+          )}
+
+          {activeTab === 'problems' && (
             <div className="space-y-6">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <h2 className="text-2xl font-bold font-heading">Constituency Issues</h2>
-                <button 
-                  onClick={handleAnalyze} 
-                  disabled={isAnalyzing || problems.length === 0}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-bold flex items-center space-x-2 disabled:opacity-50 transition-all"
-                >
-                  <svg className={`w-5 h-5 ${isAnalyzing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                  <span>{isAnalyzing ? 'AI Analyzing...' : 'AI Analysis Summary'}</span>
-                </button>
+                <div className="flex space-x-2">
+                  <button 
+                    onClick={() => downloadCSV(problems, 'problem_reports_rahad.csv')}
+                    className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center space-x-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    <span>CSV</span>
+                  </button>
+                  <button 
+                    onClick={handleAnalyze} 
+                    disabled={isAnalyzing || problems.length === 0}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-bold flex items-center space-x-2 disabled:opacity-50 transition-all"
+                  >
+                    <svg className={`w-5 h-5 ${isAnalyzing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    <span>{isAnalyzing ? 'AI Analyzing...' : 'AI Analysis Summary'}</span>
+                  </button>
+                </div>
               </div>
 
               {aiSummary && (
@@ -251,6 +303,47 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
                   </div>
                 ))}
                 {problems.length === 0 && <p className="text-slate-500 text-center py-20">No problems reported yet.</p>}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'meetings' && (
+            <div className="space-y-4">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold mb-6 font-heading">Courtyard Meeting Invites</h2>
+                <button 
+                  onClick={() => downloadCSV(meetings, 'meeting_invites_rahad.csv')}
+                  className="bg-amber-700 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center space-x-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                  <span>Export CSV</span>
+                </button>
+              </div>
+              <div className="grid gap-4">
+                {[...meetings].reverse().map(m => (
+                  <div key={m.id} className="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-sm">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-amber-900/50 text-amber-500 rounded-lg flex items-center justify-center font-bold">
+                          {m.peopleCount}
+                        </div>
+                        <h3 className="text-xl font-bold text-amber-400">{m.name}</h3>
+                      </div>
+                      <span className="text-xs text-slate-500">{new Date(m.timestamp).toLocaleString()}</span>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4 text-sm text-slate-300 mt-4">
+                      <p><span className="text-slate-500 mr-2">Phone:</span> {m.phone}</p>
+                      <p><span className="text-slate-500 mr-2">Location:</span> {m.location}</p>
+                      <p className="md:col-span-2 flex items-center text-amber-200">
+                        <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        Committed to gathering {m.peopleCount} people
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {meetings.length === 0 && <p className="text-slate-500 text-center py-20">No meeting invitations yet.</p>}
               </div>
             </div>
           )}

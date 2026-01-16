@@ -65,11 +65,17 @@ const Hero: React.FC<HeroProps> = ({ currentLanguage }) => {
             <div className="absolute top-1/2 left-1/2 md:left-2/3 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] sm:w-[280px] sm:h-[280px] md:w-[320px] md:h-[320px] lg:w-[400px] lg:h-[400px] bg-red-700/80 rounded-full blur-sm opacity-90"></div>
             <div className="relative z-20 h-full w-full max-w-sm flex items-center justify-center md:justify-end">
               <div className="relative group">
-                <img 
-                  src="https://parbattakantho.com/wp-content/uploads/2025/10/IMG-20251009-WA0011.jpg" 
-                  alt="Sheikh Monzurul Haque" 
-                  className="max-h-[250px] sm:max-h-[320px] md:max-h-[400px] lg:max-h-[480px] w-auto object-cover rounded-2xl border-4 border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform hover:scale-[1.03] transition-transform duration-500 select-none"
-                />
+                <div className="bg-slate-200 rounded-2xl overflow-hidden border-4 border-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center justify-center min-h-[250px] min-w-[200px]">
+                  <img 
+                    src="https://i.ibb.co.com/gLvhQMC2/Rahad-Vai-Image.jpg" 
+                    alt="Sheikh Monzurul Haque" 
+                    className="max-h-[250px] sm:max-h-[320px] md:max-h-[400px] lg:max-h-[500px] w-auto object-cover transform hover:scale-[1.03] transition-transform duration-500 select-none"
+                    loading="eager"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://i.ibb.co.com/gLvhQMC2/Rahad-Vai-Image.jpg';
+                    }}
+                  />
+                </div>
                 <div className="absolute -bottom-2 -left-2 bg-white py-1.5 px-3 rounded-lg shadow-xl transform -rotate-3 hidden sm:block border-b-4 border-green-700">
                   <span className="text-green-900 font-black text-xs md:text-sm tracking-tighter">
                     {currentLanguage === 'bn' ? '#চলো_একসাথে_গড়ি' : '#BuildTogether'}

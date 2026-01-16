@@ -19,6 +19,8 @@ const BlogPage: React.FC<BlogPageProps> = ({ lang }) => {
     { id: 'Update', bn: 'আপডেট', en: 'Updates' },
   ];
 
+  const fallbackImage = 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=800&auto=format&fit=crop';
+
   return (
     <div className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,11 +45,14 @@ const BlogPage: React.FC<BlogPageProps> = ({ lang }) => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
           {filteredNews.map((item) => (
             <article key={item.id} className="group bg-white rounded-3xl overflow-hidden border border-slate-100 hover:shadow-2xl transition-all duration-500 flex flex-col h-full">
-              <div className="relative h-56 overflow-hidden">
+              <div className="relative h-56 overflow-hidden bg-slate-100">
                 <img 
                   src={item.imageUrl} 
                   alt={item.title[lang]} 
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = fallbackImage;
+                  }}
                 />
                 <div className="absolute top-4 left-4">
                   <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg text-white ${
