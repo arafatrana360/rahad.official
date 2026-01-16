@@ -54,4 +54,14 @@ export interface ProblemReport {
   contact: string;
 }
 
+export interface MeetingInvitation {
+  id: string;
+  timestamp: number;
+  name: string;
+  phone: string;
+  location: string;
+  peopleCount: string;
+  isCommitted: boolean;
+}
+
 export type PageRoute = 'home' | 'timeline' | 'biography' | 'vision' | 'blog';

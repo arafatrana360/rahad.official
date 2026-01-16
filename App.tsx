@@ -10,7 +10,9 @@ import BlogPage from './components/BlogPage';
 import CampaignAssistant from './components/CampaignAssistant';
 import ScrollToTop from './components/ScrollToTop';
 import AdminDashboard from './components/AdminDashboard';
-import { VolunteerModal, ProblemModal } from './components/Modals';
+import DigitalKit from './components/DigitalKit';
+import PriorityPoll from './components/PriorityPoll';
+import { VolunteerModal, ProblemModal, MeetingModal } from './components/Modals';
 import { POLICIES, NEWS, UI_STRINGS, BIOGRAPHY_CONTENT, VISION_CONTENT, SOCIAL_LINKS } from './constants';
 import { Language, PageRoute } from './types';
 
@@ -19,6 +21,7 @@ const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<PageRoute>('home');
   const [showVolunteerModal, setShowVolunteerModal] = useState(false);
   const [showProblemModal, setShowProblemModal] = useState(false);
+  const [showMeetingModal, setShowMeetingModal] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
 
   useEffect(() => {
@@ -70,16 +73,18 @@ const App: React.FC = () => {
       {currentPage === 'home' && (
         <>
           <Hero currentLanguage={language} />
+          
           <section id="about" className="py-20 md:py-24 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid md:grid-cols-2 gap-10 lg:gap-16 items-center">
-                <div className="relative group max-w-sm mx-auto md:ml-0 md:mr-auto">
+                <div className="relative group w-full max-w-sm mx-auto md:ml-0 md:mr-auto">
                   <div className="absolute -top-6 -left-6 w-24 h-24 bg-green-100 rounded-full blur-3xl opacity-50 z-0"></div>
-                  <div className="relative z-10 overflow-hidden rounded-[2rem] shadow-xl border-4 border-white group-hover:shadow-green-900/10 transition-shadow duration-500">
+                  <div className="relative z-10 overflow-hidden rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border-4 border-white group-hover:shadow-green-900/10 transition-shadow duration-500 bg-slate-200">
                     <img 
-                      src="https://parbattakantho.com/wp-content/uploads/2025/10/IMG-20251009-WA0011.jpg" 
+                      src="https://i.ibb.co.com/gLvhQMC2/Rahad-Vai-Image.jpg" 
                       alt="শেখ মনজুরুল হক (রাহাদ)" 
-                      className="w-full h-auto object-cover max-h-[400px] transform transition-transform duration-700 group-hover:scale-105"
+                      className="w-full h-auto object-contain transform transition-transform duration-700 group-hover:scale-[1.01]"
+                      loading="lazy"
                     />
                   </div>
                 </div>
@@ -110,7 +115,12 @@ const App: React.FC = () => {
               </h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {POLICIES.map(policy => (
-                  <PolicyCard key={policy.id} policy={policy} lang={language} />
+                  <PolicyCard 
+                    key={policy.id} 
+                    policy={policy} 
+                    lang={language} 
+                    onReadMore={() => setCurrentPage('vision')}
+                  />
                 ))}
               </div>
               <button 
@@ -138,6 +148,8 @@ const App: React.FC = () => {
           
           <YouTubeGallery lang={language} />
           
+          <DigitalKit lang={language} />
+
           <NewsSection lang={language} onViewAll={() => setCurrentPage('blog')} />
         </>
       )}
@@ -154,9 +166,9 @@ const App: React.FC = () => {
                 <h2 className="text-2xl md:text-3xl font-bold text-green-900 mb-6 border-l-4 border-red-600 pl-4 font-heading">
                   {section.heading[language]}
                 </h2>
-                <p className="text-lg text-slate-700 leading-relaxed text-justify">
+                <div className="text-lg text-slate-700 leading-relaxed text-justify whitespace-pre-line space-y-4">
                   {section.content[language]}
-                </p>
+                </div>
               </div>
             ))}
           </section>
@@ -228,6 +240,41 @@ const App: React.FC = () => {
         </div>
       </section>
 
+      <section className="py-20 md:py-24 bg-slate-50 border-y border-slate-200 relative overflow-hidden">
+        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-stretch">
+            <div className="bg-amber-50 p-10 md:p-14 rounded-[3rem] border border-amber-200 shadow-sm flex flex-col justify-center text-center lg:text-left">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-100 text-amber-600 rounded-2xl mb-8 shadow-inner mx-auto lg:mx-0">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 font-heading leading-tight">{s.meeting_section_title[language]}</h2>
+              <p className="text-slate-600 mb-10 text-lg leading-relaxed">
+                {s.meeting_section_desc[language]}
+              </p>
+              <div>
+                <button 
+                  onClick={() => setShowMeetingModal(true)}
+                  className="bg-amber-600 hover:bg-amber-700 text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-amber-900/10 hover:-translate-y-1 transition-all inline-flex items-center"
+                >
+                  <span>{s.btn_meeting[language]}</span>
+                  <svg className="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div className="lg:mt-0">
+              <PriorityPoll lang={language} />
+            </div>
+          </div>
+        </div>
+      </section>
+
       <footer className="bg-white py-16 border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center mb-12">
@@ -276,6 +323,7 @@ const App: React.FC = () => {
 
       <VolunteerModal isOpen={showVolunteerModal} onClose={() => setShowVolunteerModal(false)} lang={language} />
       <ProblemModal isOpen={showProblemModal} onClose={() => setShowProblemModal(false)} lang={language} />
+      <MeetingModal isOpen={showMeetingModal} onClose={() => setShowMeetingModal(false)} lang={language} />
       {showAdminDashboard && <AdminDashboard onClose={() => setShowAdminDashboard(false)} lang={language} />}
       
       <ScrollToTop />
