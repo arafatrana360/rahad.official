@@ -68,7 +68,7 @@ const Hero: React.FC<HeroProps> = ({ currentLanguage }) => {
                 <div className="bg-slate-200 rounded-2xl overflow-hidden border-4 border-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center justify-center min-h-[250px] min-w-[200px]">
                   <img 
                     src="https://i.ibb.co.com/gLvhQMC2/Rahad-Vai-Image.jpg" 
-                    alt="Sheikh Monzurul Haque" 
+                    alt="Shaikh Monzurul Haque Rahad" 
                     className="max-h-[250px] sm:max-h-[320px] md:max-h-[400px] lg:max-h-[500px] w-auto object-cover transform hover:scale-[1.03] transition-transform duration-500 select-none"
                     loading="eager"
                     onError={(e) => {

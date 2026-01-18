@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Language } from '../types';
+import { submitToSheet } from '../services/sheetService';
 
 interface ModalProps {
   isOpen: boolean;
@@ -20,18 +21,21 @@ export const VolunteerModal: React.FC<ModalProps> = ({ isOpen, onClose, lang }) 
     setIsSubmitting(true);
     
     const submission = { ...formData, id: Date.now().toString(), timestamp: Date.now() };
+    
+    // Save locally
     const existing = JSON.parse(localStorage.getItem('volunteers') || '[]');
     localStorage.setItem('volunteers', JSON.stringify([submission, ...existing]));
     
+    // Try to save to Google Sheets
+    await submitToSheet('volunteer', submission);
+    
+    setIsSubmitting(false);
+    setIsSuccess(true);
     setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      setTimeout(() => {
-        setIsSuccess(false);
-        onClose();
-        setFormData({ name: '', phone: '', email: '', area: '', skills: '' });
-      }, 2000);
-    }, 800);
+      setIsSuccess(false);
+      onClose();
+      setFormData({ name: '', phone: '', email: '', area: '', skills: '' });
+    }, 2000);
   };
 
   const inputClass = "w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-green-600 focus:border-transparent outline-none transition-all";
@@ -128,18 +132,21 @@ export const ProblemModal: React.FC<ModalProps> = ({ isOpen, onClose, lang }) =>
     setIsSubmitting(true);
     
     const submission = { ...formData, id: Date.now().toString(), timestamp: Date.now() };
+    
+    // Save locally
     const existing = JSON.parse(localStorage.getItem('problems') || '[]');
     localStorage.setItem('problems', JSON.stringify([submission, ...existing]));
     
+    // Try to save to Google Sheets
+    await submitToSheet('problem', submission);
+    
+    setIsSubmitting(false);
+    setIsSuccess(true);
     setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      setTimeout(() => {
-        setIsSuccess(false);
-        onClose();
-        setFormData({ category: 'Roads', location: '', description: '', contact: '' });
-      }, 2000);
-    }, 800);
+      setIsSuccess(false);
+      onClose();
+      setFormData({ category: 'Roads', location: '', description: '', contact: '' });
+    }, 2000);
   };
 
   const inputClass = "w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-red-600 focus:border-transparent outline-none transition-all";
@@ -238,18 +245,21 @@ export const MeetingModal: React.FC<ModalProps> = ({ isOpen, onClose, lang }) =>
     setIsSubmitting(true);
     
     const submission = { ...formData, id: Date.now().toString(), timestamp: Date.now() };
+    
+    // Save locally
     const existing = JSON.parse(localStorage.getItem('meetings') || '[]');
     localStorage.setItem('meetings', JSON.stringify([submission, ...existing]));
     
+    // Try to save to Google Sheets
+    await submitToSheet('meeting', submission);
+    
+    setIsSubmitting(false);
+    setIsSuccess(true);
     setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      setTimeout(() => {
-        setIsSuccess(false);
-        onClose();
-        setFormData({ name: '', phone: '', location: '', peopleCount: '', isCommitted: false });
-      }, 2000);
-    }, 800);
+      setIsSuccess(false);
+      onClose();
+      setFormData({ name: '', phone: '', location: '', peopleCount: '', isCommitted: false });
+    }, 2000);
   };
 
   const inputClass = "w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition-all";

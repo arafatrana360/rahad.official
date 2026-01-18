@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { VolunteerSubmission, ProblemReport, MeetingInvitation, Language } from '../types';
 import { GoogleGenAI } from "@google/genai";
+import { GOOGLE_SHEET_APP_URL, GOOGLE_SHEET_LINK } from '../constants';
 
 interface AdminDashboardProps {
   onClose: () => void;
@@ -12,6 +13,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState(false);
+  const [showConfigHelper, setShowConfigHelper] = useState(false);
   
   const [activeTab, setActiveTab] = useState<'volunteers' | 'problems' | 'meetings'>('volunteers');
   const [volunteers, setVolunteers] = useState<VolunteerSubmission[]>([]);
@@ -48,6 +50,24 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
       setPassword('');
     }
   };
+
+  const bridgeScriptCode = `function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+  
+  // Append a row with formatted data
+  sheet.appendRow([
+    new Date(),
+    data.type,
+    data.data.name || data.data.category || "",
+    data.data.phone || data.data.location || "",
+    data.data.area || data.data.contact || "",
+    data.data.description || data.data.skills || "",
+    JSON.stringify(data.data)
+  ]);
+  
+  return ContentService.createTextOutput("Success").setMimeType(ContentService.MimeType.TEXT);
+}`;
 
   const handleLogout = () => {
     setIsAuthenticated(false);
@@ -117,11 +137,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
           <div className="absolute -bottom-8 left-20 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
         </div>
 
-        <div className="relative bg-slate-900 border border-slate-800 p-8 rounded-[2.5rem] shadow-2xl w-full max-w-md backdrop-blur-xl">
+        <div className="relative bg-slate-900 border border-slate-800 p-8 rounded-[2.5rem] shadow-2xl w-full max-md backdrop-blur-xl">
           <div className="text-center mb-8">
             <div className="w-20 h-20 bg-green-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-900/20">
               <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
             <h1 className="text-2xl font-bold text-white mb-2 font-heading">অ্যাডমিন লগইন</h1>
@@ -172,16 +192,34 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
           <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center font-bold text-white text-xl">D</div>
           <div>
             <h1 className="text-white font-bold text-xl">{lang === 'bn' ? 'অ্যাডমিন ড্যাশবোর্ড' : 'Admin Dashboard'}</h1>
-            <p className="text-slate-400 text-xs">Sheikh Monzurul Haque Campaign</p>
+            <p className="text-slate-400 text-xs flex items-center">
+              Sheikh Monzurul Haque Campaign
+              {GOOGLE_SHEET_APP_URL ? (
+                <span className="ml-2 px-1.5 py-0.5 bg-green-900/40 text-green-400 text-[10px] rounded border border-green-500/30 flex items-center">
+                  <span className="w-1 h-1 bg-green-400 rounded-full mr-1 animate-pulse"></span>
+                  Sheet Sync Active
+                </span>
+              ) : (
+                <button 
+                  onClick={() => setShowConfigHelper(!showConfigHelper)}
+                  className="ml-2 px-1.5 py-0.5 bg-slate-700 text-slate-400 text-[10px] rounded hover:bg-slate-600 transition-colors"
+                >
+                  Setup Data Sync
+                </button>
+              )}
+            </p>
           </div>
         </div>
         <div className="flex items-center space-x-3 md:space-x-4">
-          <button 
-            onClick={clearData} 
-            className="text-slate-400 hover:text-red-400 text-xs font-bold px-3 py-2 border border-slate-700 rounded-lg transition-colors"
+          <a 
+            href={GOOGLE_SHEET_LINK} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="hidden md:flex items-center space-x-2 bg-green-600/10 text-green-400 hover:bg-green-600/20 px-4 py-2 rounded-xl text-xs font-bold transition-all border border-green-500/20"
           >
-            Clear Data
-          </button>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+            <span>Open Google Sheet</span>
+          </a>
           <button 
             onClick={handleLogout}
             className="text-slate-400 hover:text-white text-xs font-bold px-3 py-2 border border-slate-700 rounded-lg transition-colors"
@@ -196,7 +234,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
 
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
         {/* Sidebar */}
-        <div className="w-full md:w-64 bg-slate-800 border-r border-slate-700 p-4 space-y-2">
+        <div className="w-full md:w-64 bg-slate-800 border-r border-slate-700 p-4 space-y-2 flex flex-col">
           <button 
             onClick={() => setActiveTab('volunteers')}
             className={`w-full text-left px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'volunteers' ? 'bg-green-600 text-white shadow-lg' : 'text-slate-400 hover:bg-white/5'}`}
@@ -215,17 +253,70 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
           >
             {lang === 'bn' ? 'উঠান বৈঠক আমন্ত্রণ' : 'Meeting Invites'} ({meetings.length})
           </button>
+          
+          <div className="mt-auto pt-4 border-t border-slate-700">
+             <a 
+               href={GOOGLE_SHEET_LINK} 
+               target="_blank" 
+               rel="noopener noreferrer"
+               className="flex items-center justify-between w-full px-4 py-3 rounded-xl bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-white transition-all text-xs font-medium"
+             >
+               <span>View Raw Data</span>
+               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+             </a>
+          </div>
         </div>
 
         {/* Content */}
         <div className="flex-1 p-6 overflow-y-auto bg-slate-900 text-white">
+          {showConfigHelper && (
+            <div className="mb-8 p-6 bg-slate-800 border border-slate-700 rounded-3xl animate-in fade-in zoom-in duration-300">
+               <h3 className="text-xl font-bold mb-4 font-heading text-green-400">Setup Google Sheet Sync</h3>
+               <p className="text-slate-400 text-sm mb-4 leading-relaxed">
+                 Follow these steps exactly to link the website to your spreadsheet:
+               </p>
+               <ol className="list-decimal list-inside space-y-4 text-sm text-slate-300 mb-6">
+                 <li>
+                   Open your sheet: <a href={GOOGLE_SHEET_LINK} target="_blank" className="text-green-400 underline">1njzyl...DIk</a>
+                 </li>
+                 <li>
+                   Go to <strong>Extensions &gt; Apps Script</strong>.
+                 </li>
+                 <li>
+                   Delete any code there and <strong>Paste this Bridge Script</strong>:
+                   <pre className="mt-2 p-3 bg-black/40 rounded-lg text-[10px] font-mono text-green-300 overflow-x-auto select-all">
+                     {bridgeScriptCode}
+                   </pre>
+                 </li>
+                 <li>
+                   Click <strong>Deploy &gt; New Deployment</strong>. Select <strong>Web App</strong>.
+                 </li>
+                 <li>
+                   Set "Execute as" to <strong>Me</strong> and "Who has access" to <strong>Anyone</strong>. Click Deploy.
+                 </li>
+                 <li>
+                   Copy the <strong>Web App URL</strong> provided and paste it into the <code>GOOGLE_SHEET_APP_URL</code> variable in your <code>constants.tsx</code> file.
+                 </li>
+               </ol>
+               <div className="flex space-x-4">
+                 <button onClick={() => setShowConfigHelper(false)} className="px-4 py-2 bg-slate-700 rounded-lg text-xs font-bold hover:bg-slate-600 transition-all">Dismiss</button>
+                 <button 
+                  onClick={() => { navigator.clipboard.writeText(bridgeScriptCode); alert('Script copied!'); }}
+                  className="px-4 py-2 bg-green-600 rounded-lg text-xs font-bold hover:bg-green-700 transition-all"
+                 >
+                   Copy Script to Clipboard
+                 </button>
+               </div>
+            </div>
+          )}
+
           {activeTab === 'volunteers' && (
             <div className="space-y-4">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold font-heading">Recent Registrations</h2>
                 <button 
                   onClick={() => downloadCSV(volunteers, 'volunteers_rahad_campaign.csv')}
-                  className="bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center space-x-2"
+                  className="bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center space-x-2 shadow-lg"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                   <span>Export CSV</span>
@@ -233,7 +324,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
               </div>
               <div className="grid gap-4">
                 {[...volunteers].reverse().map(v => (
-                  <div key={v.id} className="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-sm">
+                  <div key={v.id} className="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-sm hover:border-green-500/30 transition-all">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-xl font-bold text-green-400">{v.name}</h3>
                       <span className="text-xs text-slate-500">{new Date(v.timestamp).toLocaleString()}</span>
@@ -265,7 +356,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
                   <button 
                     onClick={handleAnalyze} 
                     disabled={isAnalyzing || problems.length === 0}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-bold flex items-center space-x-2 disabled:opacity-50 transition-all"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-bold flex items-center space-x-2 disabled:opacity-50 transition-all shadow-lg"
                   >
                     <svg className={`w-5 h-5 ${isAnalyzing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                     <span>{isAnalyzing ? 'AI Analyzing...' : 'AI Analysis Summary'}</span>
@@ -287,7 +378,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
 
               <div className="grid gap-4">
                 {[...problems].reverse().map(p => (
-                  <div key={p.id} className="bg-slate-800 p-5 rounded-2xl border border-slate-700">
+                  <div key={p.id} className="bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-red-500/30 transition-all">
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex items-center space-x-3">
                         <span className="px-3 py-1 bg-red-900/50 text-red-400 text-xs font-bold rounded-full border border-red-500/20">{p.category}</span>
@@ -310,10 +401,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
           {activeTab === 'meetings' && (
             <div className="space-y-4">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold mb-6 font-heading">Courtyard Meeting Invites</h2>
+                <h2 className="text-2xl font-bold mb-6 font-heading text-amber-400">Courtyard Meeting Invites</h2>
                 <button 
                   onClick={() => downloadCSV(meetings, 'meeting_invites_rahad.csv')}
-                  className="bg-amber-700 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center space-x-2"
+                  className="bg-amber-700 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center space-x-2 shadow-lg"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                   <span>Export CSV</span>
@@ -321,7 +412,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose, lang }) => {
               </div>
               <div className="grid gap-4">
                 {[...meetings].reverse().map(m => (
-                  <div key={m.id} className="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-sm">
+                  <div key={m.id} className="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-sm hover:border-amber-500/30 transition-all">
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-amber-900/50 text-amber-500 rounded-lg flex items-center justify-center font-bold">

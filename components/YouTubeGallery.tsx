@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { YOUTUBE_VIDEOS } from '../constants';
+import { YOUTUBE_VIDEOS, SOCIAL_LINKS } from '../constants';
 import { Language } from '../types';
 
 interface YouTubeGalleryProps {
@@ -53,7 +53,7 @@ const YouTubeGallery: React.FC<YouTubeGalleryProps> = ({ lang }) => {
                     </div>
                   </div>
 
-                  {/* Duration/Status Badge (Optional Aesthetic) */}
+                  {/* Duration/Status Badge */}
                   <div className="absolute bottom-3 right-3 bg-black/70 text-white text-[10px] font-bold px-2 py-0.5 rounded backdrop-blur-sm">
                     {lang === 'bn' ? 'ভিডিও দেখুন' : 'WATCH VIDEO'}
                   </div>
@@ -69,7 +69,7 @@ const YouTubeGallery: React.FC<YouTubeGalleryProps> = ({ lang }) => {
 
         <div className="mt-16 text-center">
           <a 
-            href="https://www.youtube.com/@shaikhmonzurulhaquerahad" 
+            href={SOCIAL_LINKS.youtube} 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center space-x-3 bg-red-600 text-white px-10 py-4 rounded-2xl font-bold hover:bg-red-700 transition-all shadow-xl hover:-translate-y-1 active:scale-95"
