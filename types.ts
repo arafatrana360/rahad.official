@@ -64,4 +64,4 @@ export interface MeetingInvitation {
   isCommitted: boolean;
 }
 
-export type PageRoute = 'home' | 'timeline' | 'biography' | 'vision' | 'blog';
+export type PageRoute = 'home' | 'timeline' | 'biography' | 'vision' | 'blog' | 'manifesto';

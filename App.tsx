@@ -81,7 +81,7 @@ const App: React.FC = () => {
                   <div className="absolute -top-6 -left-6 w-24 h-24 bg-green-100 rounded-full blur-3xl opacity-50 z-0"></div>
                   <div className="relative z-10 overflow-hidden rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border-4 border-white group-hover:shadow-green-900/10 transition-shadow duration-500 bg-slate-200">
                     <img 
-                      src="https://i.ibb.co.com/gLvhQMC2/Rahad-Vai-Image.jpg" 
+                      src="https://i.ibb.co.com/JjZTFHvg/rahadvai-about.jpg" 
                       alt="শেখ মনজুরুল হক (রাহাদ)" 
                       className="w-full h-auto object-contain transform transition-transform duration-700 group-hover:scale-[1.01]"
                       loading="lazy"
@@ -197,6 +197,49 @@ const App: React.FC = () => {
         </div>
       )}
 
+      {currentPage === 'manifesto' && (
+        <div className="min-h-screen bg-slate-50">
+          <PageHeader 
+            title={s.manifesto_title[language]} 
+            subtitle={language === 'bn' ? 'বাগেরহাট-২ আসনের আগামীর রূপরেখা' : 'The roadmap for Bagerhat-2 constituency'} 
+          />
+          <section className="py-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="bg-white p-12 md:p-20 rounded-[3rem] shadow-xl border-t-8 border-green-700 relative overflow-hidden">
+               <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-48 h-48 bg-amber-50 rounded-full blur-3xl opacity-50"></div>
+               
+               <div className="w-24 h-24 bg-amber-100 text-amber-600 rounded-[2rem] flex items-center justify-center mx-auto mb-10 shadow-inner">
+                 <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                 </svg>
+               </div>
+               
+               <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 font-heading">
+                 {s.manifesto_pending_title[language]}
+               </h2>
+               
+               <div className="p-8 bg-amber-50 rounded-3xl border border-amber-200 text-amber-900 font-medium text-lg leading-relaxed shadow-sm">
+                 {s.manifesto_pending_msg[language]}
+               </div>
+               
+               <div className="mt-12 flex flex-col items-center">
+                 <div className="flex space-x-1.5 mb-4">
+                   <div className="w-2 h-2 bg-slate-200 rounded-full"></div>
+                   <div className="w-2 h-2 bg-slate-300 rounded-full"></div>
+                   <div className="w-2 h-2 bg-slate-200 rounded-full"></div>
+                 </div>
+                 <button 
+                  onClick={() => setCurrentPage('blog')}
+                  className="text-slate-500 font-bold hover:text-green-700 transition-colors flex items-center space-x-2"
+                 >
+                   <span>{language === 'bn' ? 'সর্বশেষ আপডেট জানুন' : 'Check latest updates'}</span>
+                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                 </button>
+               </div>
+            </div>
+          </section>
+        </div>
+      )}
+
       {currentPage === 'timeline' && (
         <div className="min-h-screen">
           <PageHeader 
@@ -291,12 +334,24 @@ const App: React.FC = () => {
               </div>
             </div>
             
-            <div className="flex items-center space-x-3 md:space-x-5">
+            <div className="flex items-center space-x-3 md:space-x-4">
               <FooterSocialIcon 
                 href={SOCIAL_LINKS.facebook} 
                 label="Facebook"
                 bgColor="bg-[#1877F2]"
                 svg={<path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />}
+              />
+              <FooterSocialIcon 
+                href={SOCIAL_LINKS.instagram} 
+                label="Instagram"
+                bgColor="bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]"
+                svg={<path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />}
+              />
+              <FooterSocialIcon 
+                href={SOCIAL_LINKS.tiktok} 
+                label="TikTok"
+                bgColor="bg-[#000000]"
+                svg={<path d="M12.525.02c1.31.036 2.512.335 3.6.895V7.03c-.76-.56-1.62-.88-2.54-.88-.5 0-.98.1-1.42.28-.44.18-.83.45-1.15.77-.32.32-.59.71-.77 1.15-.18.44-.28.92-.28 1.42 0 .5.1.98.28 1.42.18.44.45.83.77 1.15.32.32.71.59 1.15.77.44.18.92.28 1.42.28.5 0 .98-.1 1.42-.28.44-.18.83-.45 1.15-.77.32-.32.59-.71.77-1.15.18-.44.28-.92.28-1.42V0h4.06c.14 2.39 1.09 4.57 2.53 6.32v4.06c-1.44-1.75-2.39-3.93-2.53-6.32h-4.06v11.19c0 1.1-.22 2.15-.61 3.11-.39.96-.96 1.81-1.67 2.52-.71.71-1.56 1.28-2.52 1.67-.96.39-2.01.61-3.11.61-1.1 0-2.15-.22-3.11-.61-.96-.39-1.81-.96-2.52-1.67-.71-.71-1.28-1.56-1.67-2.52-.39-.96-.61-2.01-.61-3.11 0-1.1.22-2.15.61-3.11.39-.96.96-1.81 1.67-2.52.71-.71 1.56-1.28 2.52-1.67.96-.39 2.01-.61 3.11-.61.1 0 .21.01.31.02V4.08c-.1-.01-.21-.02-.31-.02-1.1 0-2.15.22-3.11.61-.96.39-1.81.96-2.52 1.67-.71.71-1.28-1.56-1.67 2.52-.39.96-.61-2.01-.61-3.11 0-1.1.22-2.15.61 3.11.39.96.96 1.81 1.67 2.52.71.71 1.56 1.28 2.52 1.67.96.39 2.01.61 3.11.61 1.1 0 2.15-.22 3.11-.61.96-.39 1.81-.96-2.52-1.67-.71-.71-1.28-1.56-1.67-2.52-.39-.96-.61-2.01-.61-3.11V4.08h4.06c.14 2.39 1.09 4.57 2.53 6.32V6.34c-1.44-1.75-2.39-3.93-2.53-6.32h-4.06z" />}
               />
               <FooterSocialIcon 
                 href={SOCIAL_LINKS.youtube} 
